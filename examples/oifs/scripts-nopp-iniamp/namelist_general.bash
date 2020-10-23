@@ -121,11 +121,24 @@ fi
 
 # Add SPPT switches if TRUE
 if [ $LSPPT == "true" ] && [ $imem -gt 0 ]; then
+
+    # Change SPPT amplitude, apply the same multiplication across
+    # all scales (original: SDEV_SDT=0.52,0.18,0.06,)
+    if [ ! -z $LSPPT_AMPLITUDE ]; then
+	sdev1=$(echo "scale=4; 0.52 * $LSPPT_AMPLITUDE" | bc -l)
+	sdev2=$(echo "scale=4; 0.18 * $LSPPT_AMPLITUDE" | bc -l)
+	sdev3=$(echo "scale=4; 0.06 * $LSPPT_AMPLITUDE" | bc -l)
+    else
+	sdev1=0.52
+	sdev2=0.18
+	sdev3=0.06
+    fi
+
     NAMSPSDT="
     &NAMSPSDT
       LSPSDT=true,
       NSCALES_SDT=3,
-      SDEV_SDT=0.52,0.18,0.06,
+      SDEV_SDT=$sdev1,$sdev2,$sdev3,
       TAU_SDT=2.16e4,2.592e5,2.592e6,
       XLCOR_SDT=500.e3,1000.e3,2000.e3,
     /"
@@ -155,7 +168,6 @@ if [ ! -z $LPAR ] && [ $LPAR == "true" ] && [ $imem -gt 0 ]; then
     NAMCUMF="
     &NAMCUMF
       ENTSHALP=2.0,
-      ENTRORG=1.75E-03
     /"
 
 else
